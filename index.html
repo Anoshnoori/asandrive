@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Asan Drive - نقشه کابل</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet Routing Machine CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+    }
+
+    #header {
+      background-color: #008cba;
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #map {
+      height: calc(100% - 50px);
+      width: 100%;
+    }
+
+    .leaflet-routing-container {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="header">Asan Drive - انتخاب مبدأ و مقصد روی نقشه کابل</div>
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet Routing Machine JS -->
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+<script>
+  const map = L.map('map').setView([34.5553, 69.2075], 13); // کابل
+
+  // OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  let control = null;
+  let waypoints = [];
+
+  map.on('click', function(e) {
+    const latlng = e.latlng;
+
+    if (waypoints.length < 2) {
+      waypoints.push(latlng);
+    } else {
+      waypoints = [latlng];
+      if (control) {
+        map.removeControl(control);
+      }
+    }
+
+    if (waypoints.length === 2) {
+      control = L.Routing.control({
+        waypoints: waypoints,
+        routeWhileDragging: false,
+        show: true,
+        draggableWaypoints: false,
+        createMarker: function(i, wp, nWps) {
+          return L.marker(wp, {
+            draggable: false
+          }).bindPopup(i === 0 ? 'مبدأ' : 'مقصد').openPopup();
+        }
+      }).addTo(map);
+    }
+  });
+</script>
+
+</body>
+</html>
